@@ -76,6 +76,10 @@ input:checked + .slider:before {
   eraWidget.onConfiguration((configuration) => {
     console.log(configuration)
   })
+  eraWidget.onValues((values) => {
+    const input = document.getELementByTagName('input');
+    input.checked = !input.checked;
+  });
   eraWidget.ready()
 </script>
 </body>
