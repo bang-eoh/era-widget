@@ -78,7 +78,7 @@ input:checked + .slider:before {
     config = configuration.realtime_configs[0];
   })
   eraWidget.onValues((values) => {
-    const input = document.getELementById('the_switch');
+    const input = document.getElementById('the_switch');
     input.checked = values[config.id].value;
   });
   eraWidget.ready()
