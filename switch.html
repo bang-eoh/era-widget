@@ -70,6 +70,13 @@ input:checked + .slider:before {
   <input type="checkbox">
   <span class="slider round"></span>
 </label>
-
+<script src="https://www.unpkg.com/@eohjsc/era-widget@1.0.14/src/index.js"></script>
+<script>
+  const eraWidget = new EraWidget();
+  eraWidget.onConfiguration((configuration) => {
+    console.log(configuration)
+  })
+  eraWidget.ready()
+</script>
 </body>
 </html> 
