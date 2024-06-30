@@ -67,18 +67,19 @@ input:checked + .slider:before {
 <body>
 
 <label class="switch">
-  <input type="checkbox">
+  <input type="checkbox" id="the_switch">
   <span class="slider round"></span>
 </label>
 <script src="https://www.unpkg.com/@eohjsc/era-widget@1.0.14/src/index.js"></script>
 <script>
   const eraWidget = new EraWidget();
+  let config = null;
   eraWidget.onConfiguration((configuration) => {
-    console.log(configuration)
+    config = configuration.realtime_configs[0];
   })
   eraWidget.onValues((values) => {
-    const input = document.getELementByTagName('input');
-    input.checked = !input.checked;
+    const input = document.getELementById('the_switch');
+    input.checked = values[config.id].value;
   });
   eraWidget.ready()
 </script>
