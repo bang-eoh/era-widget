@@ -1,58 +1,86 @@
+<html>
+<head>
+  <title>Test iFrame widget</title>
+</head>
+<body>
+<div id="container"></div>
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-
-<figure class="highcharts-figure">
-    <div id="container"></div>
-</figure>
+<script src="https://www.unpkg.com/@eohjsc/era-widget@1.0.14/src/index.js"></script>
 <script>
-  Highcharts.chart('container', {
-    chart: {
+  function drawChart(categories, series) {
+    Highcharts.chart('container', {
+      chart: {
         type: 'column'
-    },
-    title: {
-        text: 'Corn vs wheat estimated production for 2020',
-        align: 'left'
-    },
-    subtitle: {
-        text:
-            'Source: <a target="_blank" ' +
-            'href="https://www.indexmundi.com/agriculture/?commodity=corn">indexmundi</a>',
-        align: 'left'
-    },
-    xAxis: {
-        categories: ['USA', 'China', 'Brazil', 'EU', 'India', 'Russia'],
+      },
+      credits: {
+        enabled: false,
+      },
+      title: null,
+      subtitle: null,
+      xAxis: {
+        categories: categories,
         crosshair: true,
         accessibility: {
-            description: 'Countries'
+          description: 'Countries'
         }
-    },
-    yAxis: {
+      },
+      yAxis: {
         min: 0,
-        title: {
-            text: '1000 metric tons (MT)'
-        }
-    },
-    tooltip: {
+      },
+      tooltip: {
         valueSuffix: ' (1000 MT)'
-    },
-    plotOptions: {
+      },
+      plotOptions: {
         column: {
-            pointPadding: 0.2,
-            borderWidth: 0
+          pointPadding: 0.2,
+          borderWidth: 0
         }
-    },
-    series: [
-        {
-            name: 'Corn',
-            data: [406292, 260000, 107000, 68300, 27500, 14500]
-        },
-        {
-            name: 'Wheat',
-            data: [51086, 136000, 5500, 141000, 107180, 77000]
-        }
-    ]
-});
+      },
+      series: series,
+    });
+  }
 
 </script>
+<script>
+  const eraWidget = new EraWidget();
+  eraWidget.onConfiguration((config) => {
+    eraWidget.requestHistories(
+      new Date().getTime() - 1000 * 60 * 60 * 24,
+      new Date().getTime()
+    )
+  })
+  eraWidget.onHistories((histories) => {
+    const categories = histories.map((item) => item.name);
+    const temperatures = []
+    const summarySeries = histories.map((item) => {
+      const timeByTemp = {};
+      item.data?.map((dataItem) => {
+        const [temp, time] = JSON.parse(dataItem.y);
+        if (!temperatures.includes(temp)) {
+          temperatures.push(temp);
+        }
+        if (!timeByTemp[temp]) {
+          timeByTemp[temp] = 0;
+        }
+        timeByTemp[temp] += time;
+      });
+      return timeByTemp;
+    });
+    const series = temperatures.sort().map((temp) => {
+      return {
+        name: temp,
+        data: summarySeries.map((item) => item[temp] || 0),
+      };
+    });
+    drawChart(
+      categories,
+      series,
+    );
+  })
+  eraWidget.ready();
+</script>
+</body>
+</html>
